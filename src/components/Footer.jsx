@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import xicon from '../assets/xicon.png'
+import linkedin from '../assets/linkedin.png'
+import fb from '../assets/fb.png'
 
 const Footer = () => {
     return (
@@ -53,13 +56,13 @@ const Footer = () => {
                     <h4 className="text-lg font-semibold text-white mb-4">Follow Us</h4>
                     <div className="flex gap-4">
                         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                            𝕏 Twitter
+                            <img src={xicon} alt="social icon" className='max-h-10'/>
                         </a>
                         <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                            LinkedIn
+                            <img src={linkedin} alt="social icon" className='max-h-20'/>
                         </a>
                         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                            Facebook
+                            <img src={fb} alt="social icon" className='max-h-5 max-w-5'/>
                         </a>
                     </div>
                 </div>

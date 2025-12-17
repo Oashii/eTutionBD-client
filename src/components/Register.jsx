@@ -56,6 +56,8 @@ const Register = () => {
               
               const data = await response.json();
               
+              console.log('Save profile response:', { response: response.ok, data, role });
+              
               if (!response.ok) {
                 throw new Error(data.message || 'Error saving profile');
               }
