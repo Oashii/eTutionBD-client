@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { AuthContext } from "../provider/AuthProvider";
 
 const Register = () => {
   const { createUser, setUser, updateUser, logInWithGoogle } = useContext(AuthContext);
+  const [role, setRole] = useState('Student');
 
   useEffect(() => {
-    document.title = 'GameHub - Register';
+    document.title = 'eTuitionBD - Register';
   }, []);
 
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Register = () => {
     const photo = form.photo.value;
     const email = form.email.value;
     const password = form.password.value;
-
+    const phone = form.phone.value;
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
     if (!passwordRegex.test(password)) {
@@ -26,13 +27,42 @@ const Register = () => {
       return;
     }
 
+    // Register user in Firebase
     createUser(email, password)
       .then((result) => {
         const user = result.user;
         updateUser({ displayName: name, photoURL: photo })
           .then(() => {
-            setUser({ ...user, displayName: name, photoURL: photo });
-            navigate("/");
+            // Save user to MongoDB with role
+            fetch('http://localhost:5000/api/auth/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name,
+                email,
+                password,
+                phone,
+                role: role,
+                profileImage: photo,
+              }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                localStorage.setItem('token', data.token);
+                setUser({ 
+                  ...user, 
+                  displayName: name, 
+                  photoURL: photo,
+                  role: role,
+                  phone,
+                });
+                alert(`Registered as ${role}!`);
+                navigate("/");
+              })
+              .catch((error) => {
+                console.error('MongoDB registration error:', error);
+                alert('Error saving user to database');
+              });
           })
           .catch((error) => {
             console.error(error);
@@ -44,13 +74,32 @@ const Register = () => {
       });
   };
 
-
   const handleGoogleSignIn = () => {
     logInWithGoogle()
       .then((result) => {
         const user = result.user;
-        setUser(user);
-        navigate("/");
+        
+        // Save Google user to MongoDB with default Student role
+        fetch('http://localhost:5000/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: user.displayName,
+            email: user.email,
+            profileImage: user.photoURL,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            localStorage.setItem('token', data.token);
+            setUser({ ...user, role: 'Student' });
+            alert('Registered as Student with Google!');
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error('Google registration error:', error);
+            alert('Error saving user to database');
+          });
       })
       .catch((error) => {
         alert(`${error.code}: ${error.message}`);
@@ -68,17 +117,34 @@ const Register = () => {
             <label className="label">Name</label>
             <input name='name' type="text" className="input" placeholder="Name" required />
 
-            {/* Photo URL */}
-            <label className="label">Photo URL</label>
-            <input name='photo' type="text" className="input" placeholder="Photo URL" required />
-
             {/* Email */}
             <label className="label">Email</label>
             <input name='email' type="email" className="input" placeholder="Email" required />
 
+            {/* Phone */}
+            <label className="label">Phone</label>
+            <input name='phone' type="tel" className="input" placeholder="Phone Number" required />
+
+            {/* Photo URL */}
+            <label className="label">Photo URL</label>
+            <input name='photo' type="text" className="input" placeholder="Photo URL" required />
+
             {/* Password */}
             <label className="label">Password</label>
             <input name='password' type="password" className="input" placeholder="Password" required />
+            <p className="text-sm text-gray-500 mt-1">Must contain uppercase, lowercase, and be at least 6 characters</p>
+
+            {/* Role Selection */}
+            <label className="label mt-4">Register As</label>
+            <select 
+              value={role} 
+              onChange={(e) => setRole(e.target.value)}
+              className="select select-bordered w-full"
+              required
+            >
+              <option value="Student">Student (Looking for tutors)</option>
+              <option value="Tutor">Tutor (Offering tuition services)</option>
+            </select>
 
             <button className="btn btn-neutral mt-4" type='submit'>
               Register
@@ -97,7 +163,7 @@ const Register = () => {
                 alt="Google"
                 className="w-5 h-5"
               />
-              Sign in with Google
+              Sign in with Google (Auto Student)
             </button>
 
             <p className='font-semibold text-center mt-3'>
