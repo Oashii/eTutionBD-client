@@ -2,12 +2,12 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCRLNIU3hr_GBV4I452Qy0nMa1K-9L_Iqc",
-  authDomain: "etuitionbd-beba7.firebaseapp.com",
-  projectId: "etuitionbd-beba7",
-  storageBucket: "etuitionbd-beba7.firebasestorage.app",
-  messagingSenderId: "644464990110",
-  appId: "1:644464990110:web:20b7ba9d19d2bef375a88f"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
