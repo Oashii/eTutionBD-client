@@ -49,27 +49,13 @@ const Checkout = () => {
     const handlePayment = async () => {
         setProcessing(true);
         try {
-            // Update application status to Approved
-            await axios.patch(
-                `http://localhost:5000/api/applications/${applicationId}`,
-                { status: 'Approved' },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                }
-            );
-
-            // Record payment transaction
+            // Record payment transaction (this also updates application status to Approved)
             await axios.post(
                 'http://localhost:5000/api/payments',
                 {
                     applicationId,
-                    tuitionId: application.tuitionId,
                     tutorId: application.tutorId,
-                    studentId: user.uid,
                     amount: application.expectedSalary,
-                    status: 'Completed',
                 },
                 {
                     headers: {

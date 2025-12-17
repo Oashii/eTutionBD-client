@@ -27,7 +27,10 @@ VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
 VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_firebase_app_id
+VITE_IMGBB_API_KEY=your_imgbb_api_key
 ```
+
+**Note:** Get your ImgBB API key from [imgbb.com](https://imgbb.com/api) - it's free!
 
 ### Running Development Server
 
