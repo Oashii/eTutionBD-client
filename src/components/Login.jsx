@@ -23,9 +23,6 @@ const Login = () => {
       const result = await logIn(email, password);
       const user = result.user;
       
-      // Get Firebase token (optional - not used for JWT)
-      const firebaseToken = await user.getIdToken();
-      
       // Call backend to get JWT token and user role
       const response = await fetch('http://localhost:5000/api/auth/firebase-login', {
         method: 'POST',
@@ -34,6 +31,8 @@ const Login = () => {
         },
         body: JSON.stringify({
           email: email,
+          name: user.displayName || email.split('@')[0],
+          profileImage: user.photoURL || '',
         }),
       });
       
@@ -67,39 +66,35 @@ const Login = () => {
       const result = await logInWithGoogle();
       const user = result.user;
       
-      // Get Firebase token
-      const firebaseToken = await user.getIdToken();
-      localStorage.setItem('token', firebaseToken);
-      
-      // Ensure user profile exists in MongoDB
-      const response = await fetch('http://localhost:5000/api/auth/save-profile', {
+      // Call backend to get JWT token
+      const response = await fetch('http://localhost:5000/api/auth/firebase-login', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${firebaseToken}`,
         },
         body: JSON.stringify({
-          name: user.displayName,
           email: user.email,
-          profileImage: user.photoURL,
-          role: 'Student',
-          phone: '',
+          name: user.displayName || 'Google User',
+          profileImage: user.photoURL || '',
         }),
       });
       
-      const data = await response.json();
-      
       if (!response.ok) {
-        throw new Error(data.message || 'Error logging in');
+        throw new Error('Error with Google login');
       }
       
-      setUser({ ...user, role: 'Student' });
-      alert('Logged in as Student with Google!');
-      // Google users default to Student role
+      const data = await response.json();
+      
+      // Store JWT token from server
+      localStorage.setItem('token', data.token);
+      
+      setUser({ ...user, role: data.user.role });
+      
+      // Google login defaults to Student role
       navigate('/student-dashboard/my-tuitions');
     } catch (error) {
       console.error('Google login error:', error);
-      alert('Error: ' + error.message);
+      alert(`Google login failed: ${error.message}`);
     }
   };
 
