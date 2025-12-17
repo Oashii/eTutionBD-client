@@ -134,7 +134,7 @@ const TuitionDetail = () => {
                     )}
 
                     {user?.role === 'Student' && (
-                        <button onClick={() => navigate('/my-tuitions')} className="btn btn-outline w-full">
+                        <button onClick={() => navigate('/student-dashboard/my-tuitions')} className="btn btn-outline w-full">
                             Manage Your Tuitions
                         </button>
                     )}

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useNavigate, useLocation } from 'react-router';
 import { AuthContext } from "../provider/AuthProvider";
 
 const Register = () => {
@@ -8,12 +8,12 @@ const Register = () => {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     document.title = 'eTuitionBD - Register';
   }, []);
-
-  const navigate = useNavigate();
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -127,8 +127,13 @@ const Register = () => {
                 });
                 alert(`Registered as ${role}! Welcome!`);
                 
-                // Route based on role
-                if (role === 'Tutor') {
+                // Get the page user was trying to access before registration
+                const from = location.state?.from?.pathname || null;
+                
+                // Route based on role, but prefer redirecting to the original page if available
+                if (from && from !== '/login' && from !== '/register') {
+                  navigate(from);
+                } else if (role === 'Tutor') {
                   navigate('/tutor-dashboard/my-applications');
                 } else {
                   navigate('/student-dashboard/my-tuitions');

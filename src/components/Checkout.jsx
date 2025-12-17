@@ -23,21 +23,26 @@ const Checkout = () => {
                         },
                     }
                 );
+                console.log('Application data:', response.data.application);
                 setApplication(response.data.application);
 
-                // Fetch tuition details
+                // Fetch tuition details using tuitionId from application
+                const tuitionId = response.data.application.tuitionId;
+                console.log('Fetching tuition with ID:', tuitionId);
+                
                 const tuitionRes = await axios.get(
-                    `http://localhost:5000/api/tuitions/${response.data.application.tuitionId}`,
+                    `http://localhost:5000/api/tuitions/${tuitionId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
                     }
                 );
+                console.log('Tuition data:', tuitionRes.data.tuition);
                 setTuition(tuitionRes.data.tuition);
             } catch (error) {
-                console.error('Error fetching details:', error);
-                alert('Error loading checkout details');
+                console.error('Error fetching details:', error.response?.data || error.message);
+                alert('Error loading checkout details: ' + (error.response?.data?.message || error.message));
                 navigate('/student-dashboard/applied-tutors');
             } finally {
                 setLoading(false);

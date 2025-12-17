@@ -15,14 +15,12 @@ const PrivateRoute = ({children, requiredRole = null}) => {
     if(user && user?.email){
         // If a specific role is required, check if user has that role
         if (requiredRole && user?.role !== requiredRole) {
-            return <Navigate to='/login' />;
+            return <Navigate to='/login' state={{ from: location }} replace />;
         }
         return children;
     }
 
-    return <Navigate state={location.pathname} to='/login'>
-
-    </Navigate>
+    return <Navigate to='/login' state={{ from: location }} replace />;
 };
 
 export default PrivateRoute;

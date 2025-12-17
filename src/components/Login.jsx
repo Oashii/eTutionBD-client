@@ -49,8 +49,13 @@ const Login = () => {
       
       setUser({ ...user, role: data.user.role });
       
-      // Route based on role
-      if (data.user.role === 'Admin') {
+      // Get the page user was trying to access before login
+      const from = location.state?.from?.pathname || null;
+      
+      // Route based on role, but prefer redirecting to the original page if available
+      if (from && from !== '/login' && from !== '/register') {
+        navigate(from);
+      } else if (data.user.role === 'Admin') {
         navigate('/admin-dashboard/users');
       } else if (data.user.role === 'Tutor') {
         navigate('/tutor-dashboard/my-applications');
@@ -94,8 +99,13 @@ const Login = () => {
       
       setUser({ ...user, role: data.user.role });
       
-      // Navigate based on role
-      if (data.user.role === 'Admin') {
+      // Get the page user was trying to access before login
+      const from = location.state?.from?.pathname || null;
+      
+      // Navigate based on role, but prefer redirecting to the original page if available
+      if (from && from !== '/login' && from !== '/register') {
+        navigate(from);
+      } else if (data.user.role === 'Admin') {
         navigate('/admin-dashboard/users');
       } else if (data.user.role === 'Tutor') {
         navigate('/tutor-dashboard/my-applications');
