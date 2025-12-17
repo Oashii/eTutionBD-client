@@ -62,6 +62,10 @@ const Register = () => {
                 throw new Error(data.message || 'Error saving profile');
               }
               
+              // Store token and role
+              localStorage.setItem('role', role);
+              localStorage.setItem('token', token);
+              
               setUser({ 
                 ...user, 
                 displayName: name, 
@@ -124,6 +128,10 @@ const Register = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Error saving user');
       }
+      
+      // Store token and role
+      localStorage.setItem('role', 'Student');
+      localStorage.setItem('token', firebaseToken);
       
       setUser({ ...user, role: 'Student' });
       alert('Registered as Student with Google!');

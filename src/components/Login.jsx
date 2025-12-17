@@ -43,8 +43,9 @@ const Login = () => {
       
       const data = await response.json();
       
-      // Store JWT token from server
+      // Store JWT token and role from server
       localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
       
       setUser({ ...user, role: data.user.role });
       
@@ -87,13 +88,20 @@ const Login = () => {
       
       const data = await response.json();
       
-      // Store JWT token from server
+      // Store JWT token and role from server
       localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
       
       setUser({ ...user, role: data.user.role });
       
-      // Google login defaults to Student role
-      navigate('/student-dashboard/my-tuitions');
+      // Navigate based on role
+      if (data.user.role === 'Admin') {
+        navigate('/admin-dashboard/users');
+      } else if (data.user.role === 'Tutor') {
+        navigate('/tutor-dashboard/my-applications');
+      } else {
+        navigate('/student-dashboard/my-tuitions');
+      }
     } catch (error) {
       console.error('Google login error:', error);
       alert(`Google login failed: ${error.message}`);

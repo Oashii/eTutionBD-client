@@ -22,7 +22,6 @@ const AuthProvider = ({ children }) => {
 
 
   const createUser = (email, password) => {
-    setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
@@ -32,19 +31,16 @@ const AuthProvider = ({ children }) => {
 
 
   const logIn = (email, password) => {
-    setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
 
   const logInWithGoogle = () => {
-    setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
 
   const logOut = () => {
-    setLoading(true);
     return signOut(auth);
   };
 
@@ -55,16 +51,59 @@ const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        setUser({
-          displayName: currentUser.displayName,
-          email: currentUser.email,
-          photoURL: currentUser.photoURL,
-          uid: currentUser.uid
-        });
+        try {
+          // Get token from localStorage
+          const token = localStorage.getItem('token');
+          
+          // If we have a token, fetch user details from the server
+          if (token) {
+            const response = await fetch('http://localhost:5000/api/auth/me', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setUser({
+                displayName: currentUser.displayName,
+                email: currentUser.email,
+                photoURL: currentUser.photoURL,
+                uid: currentUser.uid,
+                role: data.user.role,
+              });
+              localStorage.setItem('role', data.user.role);
+              setLoading(false);
+              return;
+            }
+          }
+          
+          // Fallback to localStorage role
+          const role = localStorage.getItem('role') || 'Student';
+          setUser({
+            displayName: currentUser.displayName,
+            email: currentUser.email,
+            photoURL: currentUser.photoURL,
+            uid: currentUser.uid,
+            role: role
+          });
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          const role = localStorage.getItem('role') || 'Student';
+          setUser({
+            displayName: currentUser.displayName,
+            email: currentUser.email,
+            photoURL: currentUser.photoURL,
+            uid: currentUser.uid,
+            role: role
+          });
+        }
       } else {
         setUser(null);
+        localStorage.removeItem('role');
+        localStorage.removeItem('token');
       }
       setLoading(false);
     });
