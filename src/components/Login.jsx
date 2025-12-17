@@ -37,7 +37,8 @@ const Login = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Error fetching user role');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error fetching user role');
       }
       
       const data = await response.json();
@@ -80,7 +81,8 @@ const Login = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Error with Google login');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error with Google login');
       }
       
       const data = await response.json();
