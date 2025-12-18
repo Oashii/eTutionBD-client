@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router';
 import { AuthContext } from "../provider/AuthProvider";
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const { createUser, setUser, updateUser, logInWithGoogle } = useContext(AuthContext);
@@ -63,13 +64,13 @@ const Register = () => {
 
     // Validate that an image was selected
     if (!photoFile) {
-      alert('Please select a profile image');
+      toast.error('Please select a profile image');
       return;
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
     if (!passwordRegex.test(password)) {
-      alert("Password must contain at least one uppercase letter, one lowercase letter, and be at least 6 characters long.");
+      toast.error("Password must contain at least one uppercase letter, one lowercase letter, and be at least 6 characters long.");
       return;
     }
 
@@ -125,7 +126,7 @@ const Register = () => {
                   role: role,
                   phone,
                 });
-                alert(`Registered as ${role}! Welcome!`);
+                toast.success(`Registered as ${role}! Welcome!`);
                 
                 // Get the page user was trying to access before registration
                 const from = location.state?.from?.pathname || null;
@@ -140,23 +141,23 @@ const Register = () => {
                 }
               } catch (error) {
                 console.error('Error saving profile to database:', error);
-                alert(`Registration successful! You can now login.`);
+                toast.success(`Registration successful! You can now login.`);
                 navigate("/login");
               }
             })
             .catch((error) => {
               console.error('Error updating user profile:', error);
-              alert('Error updating profile: ' + error.message);
+              toast.error('Error updating profile: ' + error.message);
             });
         })
         .catch((error) => {
           console.error('Firebase registration error:', error);
-          alert(`${error.code}: ${error.message}`);
+          toast.error(`${error.code}: ${error.message}`);
         })
         .finally(() => setUploading(false));
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Error uploading image. Please try again.');
+      toast.error('Error uploading image. Please try again.');
       setUploading(false);
     }
   };
@@ -197,11 +198,11 @@ const Register = () => {
       localStorage.setItem('token', firebaseToken);
       
       setUser({ ...user, role: 'Student' });
-      alert('Registered as Student with Google!');
+      toast.success('Registered as Student with Google!');
       navigate('/student-dashboard/my-tuitions');
     } catch (error) {
       console.error('Google registration error:', error);
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     }
   };
 

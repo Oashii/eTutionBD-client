@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const TuitionDetail = () => {
     useEffect(() => {
@@ -55,11 +56,11 @@ const TuitionDetail = () => {
                     },
                 }
             );
-            alert('Application submitted successfully!');
+            toast.success('Application submitted successfully!');
             setShowApplyModal(false);
             setFormData({ qualifications: '', experience: '', expectedSalary: '' });
         } catch (error) {
-            alert(error.response?.data?.message || 'Error submitting application');
+            toast.error(error.response?.data?.message || 'Error submitting application');
         } finally {
             setSubmitting(false);
         }

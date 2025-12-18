@@ -1,6 +1,7 @@
 import React, { use, useEffect } from "react";
 import { AuthContext } from "../provider/AuthProvider";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const UpdateProfile = () => {
 
@@ -20,12 +21,12 @@ const UpdateProfile = () => {
     updateUser({ displayName: name, photoURL: photoURL })
       .then(() => {
         setUser({ ...user, displayName: name, photoURL: photoURL });
-        alert("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
         navigate("/profile");
       })
       .catch((error) => {
         console.error(error);
-        alert("Failed to update profile.");
+        toast.error("Failed to update profile.");
       });
   };
 

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router';
 import { AuthContext } from '../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   useEffect(() => {
@@ -64,7 +65,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert(`Login failed: ${error.message}`);
+      toast.error(`Login failed: ${error.message}`);
     }
   };
 
@@ -114,7 +115,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Google login error:', error);
-      alert(`Google login failed: ${error.message}`);
+      toast.error(`Google login failed: ${error.message}`);
     }
   };
 

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import ConfirmDialog from '../ConfirmDialog';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -13,6 +15,7 @@ const UserManagement = () => {
         status: '',
         profileImage: '',
     });
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, userId: null });
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -33,18 +36,23 @@ const UserManagement = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            try {
-                await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                setUsers(users.filter((u) => u._id !== id));
-                alert('User deleted successfully');
-            } catch (error) {
-                alert('Error deleting user');
-            }
+        setDeleteConfirm({ isOpen: true, userId: id });
+    };
+
+    const confirmDelete = async () => {
+        const id = deleteConfirm.userId;
+        try {
+            await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            setUsers(users.filter((u) => u._id !== id));
+            toast.success('User deleted successfully');
+            setDeleteConfirm({ isOpen: false, userId: null });
+        } catch (error) {
+            toast.error('Error deleting user');
+            setDeleteConfirm({ isOpen: false, userId: null });
         }
     };
 
@@ -95,9 +103,9 @@ const UserManagement = () => {
 
             setSelectedUser({ ...selectedUser, ...editFormData });
             setIsEditing(false);
-            alert('User updated successfully');
+            toast.success('User updated successfully');
         } catch (error) {
-            alert(error.response?.data?.message || 'Error updating user');
+            toast.error(error.response?.data?.message || 'Error updating user');
         }
     };
 
@@ -117,9 +125,9 @@ const UserManagement = () => {
                     u._id === id ? { ...u, role: newRole } : u
                 )
             );
-            alert('User role updated successfully');
+            toast.success('User role updated successfully');
         } catch (error) {
-            alert('Error updating user');
+            toast.error('Error updating user');
         }
     };
 
@@ -371,6 +379,16 @@ const UserManagement = () => {
                     <div className="modal-backdrop" onClick={() => setSelectedUser(null)}></div>
                 </div>
             )}
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                title="Delete User"
+                message="Are you sure you want to delete this user? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                isDangerous={true}
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteConfirm({ isOpen: false, userId: null })}
+            />
         </div>
     );
 };
