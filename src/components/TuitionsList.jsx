@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -7,7 +7,6 @@ const TuitionsList = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [search, setSearch] = useState('');
     const [filters, setFilters] = useState({
         subject: '',
         location: '',
@@ -15,8 +14,9 @@ const TuitionsList = () => {
     });
     const [sortBy, setSortBy] = useState('createdAt');
     const [order, setOrder] = useState('desc');
+    const debounceTimer = useRef(null);
 
-    const fetchTuitions = async (pageNum = 1) => {
+    const fetchTuitions = useCallback(async (pageNum = 1, currentFilters = filters) => {
         setLoading(true);
         try {
             const params = {
@@ -25,9 +25,9 @@ const TuitionsList = () => {
                 sortBy,
                 order,
             };
-            if (filters.subject) params.subject = filters.subject;
-            if (filters.location) params.location = filters.location;
-            if (filters.class) params.class = filters.class;
+            if (currentFilters.subject) params.subject = currentFilters.subject;
+            if (currentFilters.location) params.location = currentFilters.location;
+            if (currentFilters.class) params.class = currentFilters.class;
 
             const response = await axios.get('http://localhost:5000/api/tuitions', { params });
             setTuitions(response.data.tuitions);
@@ -38,16 +38,42 @@ const TuitionsList = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        fetchTuitions(1);
     }, [filters, sortBy, order]);
 
+    // Debounced filter handler
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters({ ...filters, [name]: value });
+        setFilters(prev => ({ ...prev, [name]: value }));
+        
+        // Clear existing timer
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+        
+        // Set new timer for debounced search
+        debounceTimer.current = setTimeout(() => {
+            setPage(1); // Reset to page 1 when filters change
+        }, 300);
     };
+
+    // Fetch tuitions when page changes
+    useEffect(() => {
+        fetchTuitions(page, filters);
+    }, [page]);
+
+    // Fetch tuitions when sort/order changes
+    useEffect(() => {
+        fetchTuitions(1, filters);
+    }, [sortBy, order]);
+
+    // Fetch tuitions when filters change (with debounce)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchTuitions(1, filters);
+        }, 300);
+        
+        return () => clearTimeout(timer);
+    }, [filters]);
 
     if (loading && page === 1) {
         return (
