@@ -7,6 +7,13 @@ const TuitionsList = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    
+    // Separate input values from actual filters
+    const [inputValues, setInputValues] = useState({
+        subject: '',
+        location: '',
+        class: '',
+    });
     const [filters, setFilters] = useState({
         subject: '',
         location: '',
@@ -40,19 +47,21 @@ const TuitionsList = () => {
         }
     }, [filters, sortBy, order]);
 
-    // Debounced filter handler
+    // Handle input change - updates display immediately but debounces search
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-        setFilters(prev => ({ ...prev, [name]: value }));
         
-        // Clear existing timer
+        // Update input values immediately for responsive UI
+        setInputValues(prev => ({ ...prev, [name]: value }));
+        
+        // Clear existing debounce timer
         if (debounceTimer.current) {
             clearTimeout(debounceTimer.current);
         }
         
-        // Set new timer for debounced search
+        // Set new debounce timer to update filters after 300ms
         debounceTimer.current = setTimeout(() => {
-            setPage(1); // Reset to page 1 when filters change
+            setFilters(prev => ({ ...prev, [name]: value }));
         }, 300);
     };
 
@@ -66,13 +75,9 @@ const TuitionsList = () => {
         fetchTuitions(1, filters);
     }, [sortBy, order]);
 
-    // Fetch tuitions when filters change (with debounce)
+    // Fetch tuitions when filters change
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchTuitions(1, filters);
-        }, 300);
-        
-        return () => clearTimeout(timer);
+        fetchTuitions(1, filters);
     }, [filters]);
 
     if (loading && page === 1) {
@@ -96,7 +101,7 @@ const TuitionsList = () => {
                             type="text"
                             name="subject"
                             placeholder="Search by subject..."
-                            value={filters.subject}
+                            value={inputValues.subject}
                             onChange={handleFilterChange}
                             className="input input-bordered w-full"
                         />
@@ -104,7 +109,7 @@ const TuitionsList = () => {
                             type="text"
                             name="location"
                             placeholder="Filter by location..."
-                            value={filters.location}
+                            value={inputValues.location}
                             onChange={handleFilterChange}
                             className="input input-bordered w-full"
                         />
@@ -112,7 +117,7 @@ const TuitionsList = () => {
                             type="text"
                             name="class"
                             placeholder="Filter by class..."
-                            value={filters.class}
+                            value={inputValues.class}
                             onChange={handleFilterChange}
                             className="input input-bordered w-full"
                         />
