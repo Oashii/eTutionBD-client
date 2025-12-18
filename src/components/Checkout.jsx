@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const Checkout = () => {
     useEffect(() => {
@@ -45,7 +46,7 @@ const Checkout = () => {
                 setTuition(tuitionRes.data.tuition);
             } catch (error) {
                 console.error('Error fetching details:', error.response?.data || error.message);
-                alert('Error loading checkout details: ' + (error.response?.data?.message || error.message));
+                toast.error('Error loading checkout details: ' + (error.response?.data?.message || error.message));
                 navigate('/student-dashboard/applied-tutors');
             } finally {
                 setLoading(false);
@@ -72,11 +73,11 @@ const Checkout = () => {
                 }
             );
 
-            alert('Payment successful! Tutor has been approved.');
+            toast.success('Payment successful! Tutor has been approved.');
             navigate('/student-dashboard/my-tuitions');
         } catch (error) {
             console.error('Error processing payment:', error);
-            alert('Error processing payment. Please try again.');
+            toast.error('Error processing payment. Please try again.');
         } finally {
             setProcessing(false);
         }

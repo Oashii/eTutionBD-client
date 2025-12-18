@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const PostTuition = () => {
     useEffect(() => {
@@ -33,10 +34,10 @@ const PostTuition = () => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            alert('Tuition posted successfully! Admin will review and approve it.');
+            toast.success('Tuition posted successfully! Admin will review and approve it.');
             navigate('/student-dashboard/my-tuitions');
         } catch (error) {
-            alert(error.response?.data?.message || 'Error posting tuition');
+            toast.error(error.response?.data?.message || 'Error posting tuition');
         } finally {
             setSubmitting(false);
         }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const AppliedTutors = () => {
     useEffect(() => {
@@ -77,9 +78,9 @@ const AppliedTutors = () => {
                         app._id === applicationId ? { ...app, status: newStatus } : app
                     )
                 );
-                alert(`Application ${newStatus.toLowerCase()} successfully!`);
+                toast.success(`Application ${newStatus.toLowerCase()} successfully!`);
             } catch (error) {
-                alert('Error updating application');
+                toast.error('Error updating application');
             }
         }
     };

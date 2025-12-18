@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const TuitionManagement = () => {
     const [tuitions, setTuitions] = useState([]);
@@ -39,9 +40,9 @@ const TuitionManagement = () => {
                     t._id === id ? { ...t, status: 'Approved' } : t
                 )
             );
-            alert('Tuition approved successfully');
+            toast.success('Tuition approved successfully');
         } catch (error) {
-            alert('Error approving tuition');
+            toast.error('Error approving tuition');
         }
     };
 
@@ -61,9 +62,9 @@ const TuitionManagement = () => {
                     t._id === id ? { ...t, status: 'Rejected' } : t
                 )
             );
-            alert('Tuition rejected successfully');
+            toast.success('Tuition rejected successfully');
         } catch (error) {
-            alert('Error rejecting tuition');
+            toast.error('Error rejecting tuition');
         }
     };
 

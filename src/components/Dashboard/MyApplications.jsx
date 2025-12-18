@@ -95,9 +95,9 @@ const MyApplications = () => {
             ));
 
             setEditingId(null);
-            alert('Application updated successfully');
+            toast.success('Application updated successfully');
         } catch (error) {
-            alert(error.response?.data?.message || 'Error updating application');
+            toast.error(error.response?.data?.message || 'Error updating application');
         }
     };
 

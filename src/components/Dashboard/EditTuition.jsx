@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../provider/AuthProvider';
+import { toast } from 'react-toastify';
 
 const EditTuition = () => {
     useEffect(() => {
@@ -31,7 +32,7 @@ const EditTuition = () => {
                 setFormData(response.data.tuition);
             } catch (error) {
                 console.error('Error fetching tuition:', error);
-                alert('Error loading tuition');
+                toast.error('Error loading tuition');
                 navigate('/student-dashboard/my-tuitions');
             } finally {
                 setLoading(false);
@@ -52,7 +53,7 @@ const EditTuition = () => {
         e.preventDefault();
 
         if (!formData.subject || !formData.class || !formData.location || !formData.budget || !formData.schedule) {
-            alert('Please fill in all required fields');
+            toast.error('Please fill in all required fields');
             return;
         }
 
@@ -66,11 +67,11 @@ const EditTuition = () => {
                     },
                 }
             );
-            alert('Tuition updated successfully');
+            toast.success('Tuition updated successfully');
             navigate('/student-dashboard/my-tuitions');
         } catch (error) {
             console.error('Error updating tuition:', error);
-            alert('Error updating tuition');
+            toast.error('Error updating tuition');
         }
     };
 
