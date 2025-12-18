@@ -150,50 +150,62 @@ const TuitionDetail = () => {
             {/* Apply Modal */}
             {showApplyModal && (
                 <div className="modal modal-open">
-                    <div className="modal-box w-full max-w-md">
-                        <h3 className="font-bold text-lg mb-4">Apply for {tuition.subject}</h3>
+                    <div className="modal-box w-full max-w-2xl">
+                        <h3 className="font-bold text-2xl mb-2">Apply for {tuition.subject}</h3>
+                        <p className="text-sm text-gray-600 mb-6">Fill in your details to apply for this tuition position</p>
                         <form onSubmit={handleApply}>
-                            <div className="form-control mb-4">
-                                <label className="label">
-                                    <span className="label-text">Qualifications</span>
-                                </label>
-                                <textarea
-                                    className="textarea textarea-bordered h-24"
-                                    placeholder="Your qualifications..."
-                                    value={formData.qualifications}
-                                    onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
-                                    required
-                                ></textarea>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Expected Salary (Monthly)</span>
+                                    </label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-3 text-gray-500">৳</span>
+                                        <input
+                                            type="number"
+                                            className="input input-bordered w-full pl-8"
+                                            placeholder="Enter expected salary..."
+                                            value={formData.expectedSalary}
+                                            onChange={(e) => setFormData({ ...formData, expectedSalary: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Qualifications</span>
+                                    </label>
+                                    <textarea
+                                        className="textarea textarea-bordered h-28"
+                                        placeholder="e.g., Bachelor's in Mathematics, HSC in Science..."
+                                        value={formData.qualifications}
+                                        onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
+                                        required
+                                    ></textarea>
+                                    <label className="label">
+                                        <span className="label-text-alt text-gray-500">Share your educational background and certifications</span>
+                                    </label>
+                                </div>
+
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text font-semibold">Teaching Experience</span>
+                                    </label>
+                                    <textarea
+                                        className="textarea textarea-bordered h-28"
+                                        placeholder="e.g., 5 years teaching experience at XYZ school..."
+                                        value={formData.experience}
+                                        onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                                        required
+                                    ></textarea>
+                                    <label className="label">
+                                        <span className="label-text-alt text-gray-500">Describe your teaching experience and achievements</span>
+                                    </label>
+                                </div>
                             </div>
 
-                            <div className="form-control mb-4">
-                                <label className="label">
-                                    <span className="label-text">Experience</span>
-                                </label>
-                                <textarea
-                                    className="textarea textarea-bordered h-24"
-                                    placeholder="Your experience..."
-                                    value={formData.experience}
-                                    onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                                    required
-                                ></textarea>
-                            </div>
-
-                            <div className="form-control mb-6">
-                                <label className="label">
-                                    <span className="label-text">Expected Salary</span>
-                                </label>
-                                <input
-                                    type="number"
-                                    className="input input-bordered"
-                                    placeholder="Expected salary..."
-                                    value={formData.expectedSalary}
-                                    onChange={(e) => setFormData({ ...formData, expectedSalary: e.target.value })}
-                                    required
-                                />
-                            </div>
-
-                            <div className="modal-action">
+                            <div className="modal-action mt-8">
                                 <button
                                     type="button"
                                     onClick={() => setShowApplyModal(false)}
