@@ -57,7 +57,7 @@ const UpdateProfile = () => {
           className="input input-bordered w-full mb-4"
         />
 
-        <button type="submit" className="btn btn-info text-white w-full mt-2">
+        <button type="submit" className="btn btn-primary w-full mt-2">
           Update Information
         </button>
       </form>

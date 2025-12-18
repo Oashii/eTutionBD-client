@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from "../provider/AuthProvider";
+import Logo from '../assets/logo.png';
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -41,8 +42,8 @@ const Navbar = () => {
               <li><NavLink to="/contact">Contact</NavLink></li>
             </ul>
           </div>
-          <NavLink to="/" className="btn btn-ghost text-xl font-bold">
-            eTuitionBD
+          <NavLink to="/" >
+            <img src={Logo} alt="Logo" className='max-h-15' />
           </NavLink>
         </div>
 

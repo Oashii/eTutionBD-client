@@ -25,13 +25,13 @@ const Profile = () => {
       <img
         src={user.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"}
         alt="Profile"
-        className="w-32 h-32 rounded-full mb-5 border-4 border-cyan-500 object-cover"
+        className="w-32 h-32 rounded-full mb-5 border-4 border-blue-500 object-cover"
       />
       <h2 className="text-2xl font-bold mb-2">Name: {user.displayName || "No name set"}</h2>
       <p className="text-lg mb-6">Email: {user.email}</p>
       <button
         onClick={() => navigate("/update-profile")}
-        className="btn btn-info text-white px-6"
+        className="btn btn-primary px-6"
       >
         Update Information
       </button>
