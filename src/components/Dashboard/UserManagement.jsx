@@ -202,23 +202,28 @@ const UserManagement = () => {
                             {isEditing ? 'Edit User Profile' : 'User Profile'}
                         </h3>
 
-                        <div className="space-y-6">
-                            {/* Profile Image */}
-                            <div className="flex justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Profile Image - Left Side */}
+                            <div className="md:col-span-1 flex flex-col items-center">
                                 {editFormData.profileImage ? (
                                     <img
                                         src={editFormData.profileImage}
                                         alt={editFormData.name}
-                                        className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
+                                        className="w-40 h-40 rounded-full object-cover border-4 border-blue-500"
                                     />
                                 ) : (
-                                    <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-4xl">
+                                    <div className="w-40 h-40 rounded-full bg-gray-300 flex items-center justify-center text-6xl">
                                         👤
                                     </div>
                                 )}
+                                {isEditing && (
+                                    <p className="text-xs text-gray-500 mt-4 text-center">Update the image URL below</p>
+                                )}
                             </div>
 
-                            {isEditing ? (
+                            {/* User Info/Form - Right Side */}
+                            <div className="md:col-span-2">
+                                {isEditing ? (
                                 // Edit Form
                                 <div className="space-y-4">
                                     {/* Name */}
@@ -325,6 +330,7 @@ const UserManagement = () => {
                                     </div>
                                 </div>
                             )}
+                            </div>
                         </div>
 
                         {/* Modal Actions */}
