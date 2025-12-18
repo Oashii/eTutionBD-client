@@ -12,7 +12,7 @@ export default function App() {
       <Footer />
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
