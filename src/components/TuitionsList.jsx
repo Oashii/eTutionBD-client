@@ -31,7 +31,7 @@ const TuitionsList = () => {
         try {
             const params = {
                 page: pageNum,
-                limit: 12,
+                limit: 9,
                 sortBy,
                 order,
             };
