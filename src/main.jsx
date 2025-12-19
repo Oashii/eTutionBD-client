@@ -77,6 +77,10 @@ const router = createBrowserRouter([
         element: <PrivateRoute><Checkout /></PrivateRoute>,
       },
       {
+        path: '/checkout',
+        element: <PrivateRoute><Checkout /></PrivateRoute>,
+      },
+      {
         path: '/tutors',
         element: <TutorsList />,
       },

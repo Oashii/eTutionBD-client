@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../provider/AuthProvider';
@@ -8,19 +8,76 @@ const Checkout = () => {
     useEffect(() => {
     document.title = 'eTuitionBD - Checkout';
   }, []);
-    const { applicationId } = useParams();
+    const { applicationId: routeApplicationId } = useParams();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const [application, setApplication] = useState(null);
     const [tuition, setTuition] = useState(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
+    const paymentProcessedRef = useRef(false);
+
+    useEffect(() => {
+        const checkPaymentSuccess = async () => {
+            // Check if this is a return from Stripe payment
+            const query = new URLSearchParams(window.location.search);
+            
+            if (query.get('success') === 'true' && !paymentProcessedRef.current) {
+                const appId = query.get('applicationId');
+                const tutorId = query.get('tutorId');
+                
+                if (appId && tutorId) {
+                    paymentProcessedRef.current = true; // Mark as processed to prevent duplicate calls
+                    setLoading(true);
+                    try {
+                        // Record the payment in the database
+                        const response = await axios.get(
+                            `http://localhost:5000/api/applications/${appId}`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                            }
+                        );
+
+                        await axios.post(
+                            'http://localhost:5000/api/payments',
+                            {
+                                applicationId: appId,
+                                tutorId: tutorId,
+                                amount: response.data.application.expectedSalary,
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                            }
+                        );
+
+                        toast.success('Payment successful! Tutor has been approved.');
+                        // Use a small delay to ensure the toast is visible before navigating
+                        setTimeout(() => {
+                            navigate('/student-dashboard/my-tuitions');
+                        }, 1000);
+                    } catch (error) {
+                        console.error('Error recording payment:', error);
+                        toast.error('Payment was successful but there was an issue recording it.');
+                        setLoading(false);
+                        paymentProcessedRef.current = false; // Reset flag on error to allow retry
+                    }
+                    return; // Exit early to prevent the other useEffect from running
+                }
+            }
+        };
+
+        checkPaymentSuccess();
+    }, [navigate]);
 
     useEffect(() => {
         const fetchApplicationDetails = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:5000/api/applications/${applicationId}`,
+                    `http://localhost:5000/api/applications/${routeApplicationId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -52,18 +109,23 @@ const Checkout = () => {
                 setLoading(false);
             }
         };
-        fetchApplicationDetails();
-    }, [applicationId, navigate]);
+        
+        // Only fetch if we have a route application ID (normal checkout flow)
+        if (routeApplicationId) {
+            fetchApplicationDetails();
+        }
+    }, [routeApplicationId, navigate]);
 
     const handlePayment = async () => {
         setProcessing(true);
         try {
-            // Record payment transaction (this also updates application status to Approved)
-            await axios.post(
-                'http://localhost:5000/api/payments',
+            // Create Stripe checkout session
+            const response = await axios.post(
+                'http://localhost:5000/api/create-checkout-session',
                 {
-                    applicationId,
+                    applicationId: routeApplicationId,
                     tutorId: application.tutorId,
+                    tuitionId: application.tuitionId,
                     amount: application.expectedSalary,
                 },
                 {
@@ -73,12 +135,15 @@ const Checkout = () => {
                 }
             );
 
-            toast.success('Payment successful! Tutor has been approved.');
-            navigate('/student-dashboard/my-tuitions');
+            // Redirect to Stripe checkout
+            if (response.data.url) {
+                window.location.href = response.data.url;
+            } else {
+                throw new Error('No checkout URL returned');
+            }
         } catch (error) {
-            console.error('Error processing payment:', error);
-            toast.error('Error processing payment. Please try again.');
-        } finally {
+            console.error('Error creating checkout session:', error);
+            toast.error('Error creating payment session. Please try again.');
             setProcessing(false);
         }
     };
@@ -174,8 +239,7 @@ const Checkout = () => {
                     {/* Payment Info */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
                         <p className="text-sm text-blue-800">
-                            <strong>Note:</strong> This is a demonstration payment system for project purposes. Upon clicking "Pay", 
-                            the tutor will be approved and payment will be recorded in your transaction history.
+                            <strong>Secure Payment:</strong> You will be redirected to Stripe's secure payment gateway. We accept all major credit and debit cards.
                         </p>
                     </div>
 
