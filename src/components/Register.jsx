@@ -87,46 +87,39 @@ const Register = () => {
           updateUser({ displayName: name, photoURL: photoUrl })
             .then(async () => {
               try {
-                // Get Firebase token
-                const token = await user.getIdToken();
-                localStorage.setItem('token', token);
-                
-                // Save user profile to MongoDB via save-profile endpoint
-                const response = await fetch('https://etuitionbd.vercel.app/api/auth/save-profile', {
+                // Save user profile to MongoDB via firebase-login endpoint
+                // This will create/update the user and generate a proper JWT token
+                const response = await fetch('https://etuitionbd.vercel.app/api/auth/firebase-login', {
                   method: 'POST',
                   headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
                   },
                   body: JSON.stringify({
                     name,
                     email,
-                    phone,
-                    role: role,
                     profileImage: photoUrl,
                   }),
                 });
                 
                 const data = await response.json();
                 
-                console.log('Save profile response:', { response: response.ok, data, role });
+                console.log('Save profile response:', data);
                 
                 if (!response.ok) {
                   throw new Error(data.message || 'Error saving profile');
                 }
                 
-                // Store token and role
-                localStorage.setItem('role', role);
-                localStorage.setItem('token', token);
+                // Store JWT token (not Firebase token) and role from server
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.user.role);
                 
                 setUser({ 
                   ...user, 
                   displayName: name, 
                   photoURL: photoUrl,
-                  role: role,
-                  phone,
+                  role: data.user.role,
                 });
-                toast.success(`Registered as ${role}! Welcome!`);
+                toast.success(`Registered as ${data.user.role}! Welcome!`);
                 
                 // Get the page user was trying to access before registration
                 const from = location.state?.from?.pathname || null;
@@ -134,7 +127,7 @@ const Register = () => {
                 // Route based on role, but prefer redirecting to the original page if available
                 if (from && from !== '/login' && from !== '/register') {
                   navigate(from);
-                } else if (role === 'Tutor') {
+                } else if (data.user.role === 'Tutor') {
                   navigate('/tutor-dashboard/my-applications');
                 } else {
                   navigate('/student-dashboard/my-tuitions');
@@ -167,23 +160,16 @@ const Register = () => {
       const result = await logInWithGoogle();
       const user = result.user;
       
-      // Get Firebase token
-      const firebaseToken = await user.getIdToken();
-      localStorage.setItem('token', firebaseToken);
-      
-      // Save Google user to MongoDB with default Student role
-      const response = await fetch('https://etuitionbd.vercel.app/api/auth/save-profile', {
+      // Call firebase-login endpoint to get JWT token and save user
+      const response = await fetch('https://etuitionbd.vercel.app/api/auth/firebase-login', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${firebaseToken}`,
         },
         body: JSON.stringify({
-          name: user.displayName,
+          name: user.displayName || 'Google User',
           email: user.email,
           profileImage: user.photoURL,
-          role: 'Student',
-          phone: '',
         }),
       });
       
@@ -193,13 +179,19 @@ const Register = () => {
         throw new Error(data.message || 'Error saving user');
       }
       
-      // Store token and role
-      localStorage.setItem('role', 'Student');
-      localStorage.setItem('token', firebaseToken);
+      // Store JWT token (not Firebase token) and role from server
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
       
-      setUser({ ...user, role: 'Student' });
-      toast.success('Registered as Student with Google!');
-      navigate('/student-dashboard/my-tuitions');
+      setUser({ ...user, role: data.user.role });
+      toast.success(`Registered as ${data.user.role} with Google!`);
+      
+      // Navigate based on role
+      if (data.user.role === 'Tutor') {
+        navigate('/tutor-dashboard/my-applications');
+      } else {
+        navigate('/student-dashboard/my-tuitions');
+      }
     } catch (error) {
       console.error('Google registration error:', error);
       toast.error('Error: ' + error.message);
