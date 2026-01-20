@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from "../provider/AuthProvider";
+import { useTheme } from "../provider/ThemeProvider";
 import Logo from '../assets/logo.png';
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
+  const { isDark, toggleTheme } = useTheme();
 
   const handleLogOut = () => {
     logOut().then(() => {
@@ -32,7 +34,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="navbar bg-base-100 shadow-md sticky top-0 z-50">
+      <div className="navbar bg-base-100 dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -40,7 +42,7 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
               </svg>
             </div>
-            <ul tabIndex="-1" className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+            <ul tabIndex="-1" className="menu menu-sm dropdown-content bg-base-100 dark:bg-gray-900 rounded-box z-1 mt-3 w-52 p-2 shadow">
               <li><NavLink to="/">Home</NavLink></li>
               <li><NavLink to="/tuitions">Tuitions</NavLink></li>
               <li><NavLink to="/tutors">Tutors</NavLink></li>
@@ -63,8 +65,17 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Login/Logout Toggle */}
+        {/* Theme Toggle and Login/Logout */}
         <div className='flex gap-2 items-center navbar-end'>
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className='btn btn-ghost btn-circle text-lg'
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark ? '☀️' : '🌙'}
+          </button>
+
           {user && user?.email ? (
             <div className="flex gap-2 items-center">
               <div className="dropdown dropdown-end">
@@ -74,7 +85,7 @@ const Navbar = () => {
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 dark:bg-gray-900 rounded-box w-52">
                   <li><a onClick={closeDropdown}><NavLink to='/profile'>Profile</NavLink></a></li>
                   <li><a onClick={closeDropdown}><NavLink to={getDashboardLink()}>Dashboard</NavLink></a></li>
                   <li><a onClick={() => { closeDropdown(); handleLogOut(); }}>Logout</a></li>

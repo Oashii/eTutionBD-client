@@ -10,8 +10,16 @@ const Login = () => {
 
   const { logIn, logInWithGoogle, setUser } = useContext(AuthContext);
   const [emailValue, setEmailValue] = useState("");
+  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Demo credentials
+  const demoAccounts = {
+    student: { email: 'student@etuitionbd.com', password: 'Student@123' },
+    tutor: { email: 'tutor@etuitionbd.com', password: 'Tutor@123' },
+    admin: { email: 'admin@etuitionbd.com', password: 'Admin@123' }
+  };
 
   const handleLogIn = async (e) => {
     e.preventDefault();
@@ -19,6 +27,11 @@ const Login = () => {
     const email = form.email.value;
     const password = form.password.value;
 
+    await performLogin(email, password);
+  };
+
+  const performLogin = async (email, password) => {
+    setLoading(true);
     try {
       // Login with Firebase
       const result = await logIn(email, password);
@@ -63,13 +76,31 @@ const Login = () => {
       } else {
         navigate('/student-dashboard/my-tuitions');
       }
+      toast.success('Login successful!');
     } catch (error) {
       console.error('Login error:', error);
       toast.error(`Login failed: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleDemoLogin = (accountType) => {
+    const credentials = demoAccounts[accountType];
+    setEmailValue(credentials.email);
+    const form = document.querySelector('form');
+    if (form) {
+      form.email.value = credentials.email;
+      form.password.value = credentials.password;
+    }
+    // Auto-submit after a short delay to allow state update
+    setTimeout(() => {
+      performLogin(credentials.email, credentials.password);
+    }, 100);
+  };
+
   const handleGoogleLogin = async () => {
+    setLoading(true);
     try {
       const result = await logInWithGoogle();
       const user = result.user;
@@ -113,15 +144,18 @@ const Login = () => {
       } else {
         navigate('/student-dashboard/my-tuitions');
       }
+      toast.success('Google login successful!');
     } catch (error) {
       console.error('Google login error:', error);
       toast.error(`Google login failed: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className='flex justify-center my-30'>
-      <div className="card bg-base-100 w-full max-w-sm shadow-2xl py-5">
+      <div className="card bg-base-100 dark:bg-gray-900 w-full max-w-sm shadow-2xl py-5">
         <h2 className='font-semibold text-2xl text-center'>Login Your Account</h2>
         <form onSubmit={handleLogIn} className="card-body">
           <fieldset className="fieldset">
@@ -131,7 +165,7 @@ const Login = () => {
             <input
               name='email'
               type="email"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-700"
               placeholder="Email"
               value={emailValue}
               onChange={(e) => setEmailValue(e.target.value)}
@@ -143,7 +177,7 @@ const Login = () => {
             <input
               name='password'
               type="password"
-              className="input"
+              className="input dark:bg-gray-800 dark:border-gray-700"
               placeholder="Password"
               required
             />
@@ -157,16 +191,51 @@ const Login = () => {
               </NavLink>
             </div>
 
-            <button className="btn btn-neutral mt-4" type='submit'>
-              Login
+            <button 
+              className="btn btn-neutral mt-4" 
+              type='submit'
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
             </button>
 
-            <h2 className='font-semibold text-center mt-2'>-------- Or --------</h2>
+            <h2 className='font-semibold text-center mt-4'>Demo Accounts</h2>
+            <p className='text-sm text-gray-600 dark:text-gray-400 text-center mb-2'>Click to auto-fill credentials</p>
+            
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              <button
+                type='button'
+                onClick={() => handleDemoLogin('student')}
+                className="btn btn-sm bg-green-600 hover:bg-green-700 text-white"
+                disabled={loading}
+              >
+                Student
+              </button>
+              <button
+                type='button'
+                onClick={() => handleDemoLogin('tutor')}
+                className="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={loading}
+              >
+                Tutor
+              </button>
+              <button
+                type='button'
+                onClick={() => handleDemoLogin('admin')}
+                className="btn btn-sm bg-red-600 hover:bg-red-700 text-white"
+                disabled={loading}
+              >
+                Admin
+              </button>
+            </div>
+
+            <h2 className='font-semibold text-center'>-------- Or --------</h2>
 
             <button
               type='button'
               onClick={handleGoogleLogin}
-              className="btn mt-3 bg-white text-black border border-gray-300 hover:bg-gray-100 flex items-center justify-center gap-2"
+              className="btn mt-3 bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+              disabled={loading}
             >
               <img
                 src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"

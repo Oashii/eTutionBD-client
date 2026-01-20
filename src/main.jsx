@@ -7,6 +7,7 @@ import Login from './components/Login.jsx'
 import Register from './components/Register.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import AuthProvider from './provider/AuthProvider.jsx'
+import ThemeProvider from './provider/ThemeProvider.jsx'
 import Profile from './components/Profile.jsx'
 import UpdateProfile from './components/UpdateProfile.jsx'
 import TuitionsList from './components/TuitionsList.jsx'
@@ -33,6 +34,11 @@ import AdminAnalytics from './components/Dashboard/AdminAnalytics.jsx'
 import PrivateRoute from './provider/PrivateRoute.jsx'
 import EditTuition from './components/Dashboard/EditTuition.jsx'
 import Checkout from './components/Checkout.jsx'
+import PrivacyPolicy from './components/PrivacyPolicy.jsx'
+import TermsOfService from './components/TermsOfService.jsx'
+import FAQPage from './components/FAQ.jsx'
+import Blog from './components/Blog.jsx'
+import HelpSupport from './components/HelpSupport.jsx'
 
 const router = createBrowserRouter([
   {
@@ -95,6 +101,26 @@ const router = createBrowserRouter([
       {
         path: '/about',
         element: <About />,
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: '/terms',
+        element: <TermsOfService />,
+      },
+      {
+        path: '/faq',
+        element: <FAQPage />,
+      },
+      {
+        path: '/blog',
+        element: <Blog />,
+      },
+      {
+        path: '/help',
+        element: <HelpSupport />,
       },
       // Student Dashboard Routes
       {
@@ -179,8 +205,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router}></RouterProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
